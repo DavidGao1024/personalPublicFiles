@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大卫的数据解密魔法书</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .main {
+            display: flex;
+            min-height: 600px;
+        }
+
+        .left-panel {
+            flex: 1;
+            padding: 30px;
+            border-right: 1px solid #e0e0e0;
+        }
+
+        .right-panel {
+            flex: 1;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        input[type="password"],
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+            font-family: monospace;
+        }
+
+        input[type="password"]:focus,
+        input[type="text"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 200px;
+        }
+
+        .key-input-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .key-input-group input {
+            flex: 1;
+        }
+
+        .toggle-visibility {
+            background: #f5f5f5;
+            border: 1px solid #e0e0e0;
+            cursor: pointer;
+            color: #666;
+            padding: 8px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            font-size: 14px;
+            height: 44px;
+            width: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .toggle-visibility:hover {
+            background: #e8e8e8;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button.secondary {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        button.secondary:hover {
+            background: #e8e8e8;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .search-stats {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 5px;
+        }
+
+        .nav-btn {
+            padding: 5px 10px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .nav-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .json-output {
+            flex: 1;
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            overflow: auto;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            position: relative;
+            max-height: calc(100vh - 350px);
+            word-wrap: break-word;
+            word-break: break-all;
+            white-space: pre-wrap;
+        }
+
+        .json-output pre {
+            white-space: pre-wrap !important;
+            word-wrap: break-word !important;
+            word-break: break-all !important;
+            width: 100%;
+        }
+
+        .json-output.error {
+            border-color: #ff6b6b;
+            background: #fff5f5;
+            color: #c92a2a;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 8px 15px;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .copy-btn:hover {
+            background: #f8f9fa;
+        }
+
+        .copy-btn.copied {
+            background: #51cf66;
+            color: white;
+            border-color: #51cf66;
+        }
+
+        /* JSON 格式化样式 */
+        .json-key {
+            color: #881391;
+            font-weight: 600;
+        }
+
+        .json-string {
+            color: #0451a5;
+        }
+
+        .json-number {
+            color: #098658;
+        }
+
+        .json-boolean {
+            color: #0000ff;
+        }
+
+        .json-null {
+            color: #666;
+        }
+
+        .highlight {
+            background-color: #ffeb3b;
+            padding: 2px 0;
+            border-radius: 2px;
+        }
+
+        .current-highlight {
+            background-color: #ff9800;
+            color: white;
+        }
+
+        .status-bar {
+            background: #f8f9fa;
+            padding: 10px 30px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #51cf66;
+        }
+
+        .status-dot.error {
+            background: #ff6b6b;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .main {
+                flex-direction: column;
+            }
+
+            .left-panel {
+                border-right: none;
+                border-bottom: 1px solid #e0e0e0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 大卫的数据解密魔法书</h1>
+            <p>安全的客户端解密工具 - 密钥不会被存储或传输</p>
+        </div>
+
+        <div class="main">
+            <div class="left-panel">
+                <div class="form-group">
+                    <label for="key">解密密钥 (AES Key)</label>
+                    <div class="key-input-group">
+                        <input type="password" id="key" placeholder="请输入16位解密密钥">
+                        <button class="toggle-visibility" onclick="toggleKeyVisibility()">🙈</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="encrypted">加密数据</label>
+                    <textarea id="encrypted" placeholder="请粘贴需要解密的Base64编码数据..."></textarea>
+                </div>
+
+                <div class="button-group">
+                    <button onclick="decrypt()">🔓 解密</button>
+                    <button class="secondary" onclick="clearAll()">🗑️ 清空</button>
+                </div>
+
+                <div class="form-group" style="margin-top: 30px;">
+                    <label>使用说明</label>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; font-size: 13px; line-height: 1.8; color: #666;">
+                        <p>1. 输入解密密钥（16位字符）</p>
+                        <p>2. 粘贴加密的Base64数据</p>
+                        <p>3. 点击解密按钮</p>
+                        <p>4. 支持搜索和高亮显示</p>
+                        <p style="margin-top: 10px; color: #ff6b6b;">⚠️ 注意：密钥仅在本地使用，不会上传</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="right-panel">
+                <div class="search-bar">
+                    <input type="text" class="search-input" id="searchInput" placeholder="搜索 JSON 内容..." onkeydown="handleSearch(event)" oninput="handleSearch(event)">
+                    <div class="search-stats">
+                        <span id="searchStats"></span>
+                        <div class="nav-buttons" id="navButtons" style="display: none;">
+                            <button class="nav-btn" onclick="navigateSearch('prev')">⬆</button>
+                            <button class="nav-btn" onclick="navigateSearch('next')">⬇</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="json-output" id="output">
+                </div>
+
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p style="margin-top: 10px; color: #666;">正在解密...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="status-bar">
+            <div class="status-indicator">
+                <span class="status-dot" id="statusDot"></span>
+                <span id="statusText">就绪</span>
+            </div>
+            <div>
+                <span id="timestamp"></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let decryptedData = null;
+        let searchResults = [];
+        let currentSearchIndex = -1;
+
+        function toggleKeyVisibility() {
+            const keyInput = document.getElementById('key');
+            const button = document.querySelector('.toggle-visibility');
+            if (keyInput.type === 'password') {
+                keyInput.type = 'text';
+                button.textContent = '👁️';
+            } else {
+                keyInput.type = 'password';
+                button.textContent = '🙈';
+            }
+        }
+
+        function decrypt() {
+            const keyValue = document.getElementById('key').value;
+            const encryptedData = document.getElementById('encrypted').value.trim();
+            const output = document.getElementById('output');
+            const loading = document.getElementById('loading');
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
+
+            if (!keyValue) {
+                showError('请输入解密密钥');
+                return;
+            }
+
+            if (!encryptedData) {
+                showError('请输入加密数据');
+                return;
+            }
+
+            loading.classList.add('active');
+
+            setTimeout(() => {
+                try {
+                    // 解密逻辑
+                    const key = CryptoJS.enc.Utf8.parse(keyValue);
+                    const iv = CryptoJS.enc.Utf8.parse('');
+
+                    const decryptedBytes = CryptoJS.AES.decrypt({
+                        ciphertext: CryptoJS.enc.Base64.parse(encryptedData)
+                    }, key, {
+                        iv: iv,
+                        mode: CryptoJS.mode.ECB,
+                        padding: CryptoJS.pad.Pkcs7
+                    });
+
+                    const decryptedString = CryptoJS.enc.Utf8.stringify(decryptedBytes).toString();
+
+                    // 尝试解析 JSON
+                    const jsonData = JSON.parse(decryptedString);
+                    decryptedData = jsonData;
+
+                    // 格式化显示
+                    displayJSON(jsonData);
+
+                    // 更新状态
+                    statusDot.classList.remove('error');
+                    statusText.textContent = '善解人意 😊';
+                    document.getElementById('timestamp').textContent = new Date().toLocaleString();
+
+                } catch (error) {
+                    console.error('解密错误:', error);
+                    output.classList.add('error');
+
+                    let errorMessage = '解密失败';
+                    let errorDetail = '';
+
+                    if (error.message && error.message.includes('JSON')) {
+                        errorDetail = '解密成功但数据不是有效的JSON格式';
+                    } else if (error.message && error.message.includes('Malformed')) {
+                        errorDetail = '加密数据格式错误，请检查是否为有效的Base64编码';
+                    } else if (error.message && (error.message.includes('decrypt') || error.message.includes('padding'))) {
+                        errorDetail = '密钥不正确或数据格式无效';
+                    } else {
+                        errorDetail = error.message || '未知错误';
+                    }
+
+                    output.innerHTML = `
+                        <div style="text-align: center;">
+                            <h3 style="color: #ff6b6b; margin-bottom: 10px;">❌ ${errorMessage}</h3>
+                            <p style="color: #666; font-size: 16px; margin-bottom: 10px;">${errorDetail}</p>
+                            <p style="color: #999; margin-top: 20px; font-size: 13px;">
+                                可能的原因：<br>
+                                1. 密钥不正确（应为16位字符）<br>
+                                2. 加密数据格式错误<br>
+                                3. 数据未使用AES ECB模式加密
+                            </p>
+                        </div>
+                    `;
+
+                    statusDot.classList.add('error');
+                    statusText.textContent = '解密失败：' + errorDetail;
+                } finally {
+                    loading.classList.remove('active');
+                }
+            }, 300);
+        }
+
+        function displayJSON(data) {
+            const output = document.getElementById('output');
+            output.classList.remove('error');
+
+            // 创建复制按钮
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'copy-btn';
+            copyBtn.textContent = '📋 复制';
+            copyBtn.onclick = copyJSON;
+
+            // 格式化JSON并保留缩进
+            const formattedJSON = JSON.stringify(data, null, 2);
+            const formattedHTML = syntaxHighlight(formattedJSON);
+
+            // 使用 pre 标签保留格式
+            output.innerHTML = '<pre style="margin: 0; background: transparent; border: none; padding: 0;">' + formattedHTML + '</pre>';
+            output.appendChild(copyBtn);
+        }
+
+        function syntaxHighlight(json) {
+            json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+                let cls = 'json-number';
+                if (/^"/.test(match)) {
+                    if (/:$/.test(match)) {
+                        cls = 'json-key';
+                    } else {
+                        cls = 'json-string';
+                    }
+                } else if (/true|false/.test(match)) {
+                    cls = 'json-boolean';
+                } else if (/null/.test(match)) {
+                    cls = 'json-null';
+                }
+                return '<span class="' + cls + '">' + match + '</span>';
+            });
+        }
+
+        function copyJSON() {
+            if (!decryptedData) return;
+
+            const copyBtn = document.querySelector('.copy-btn');
+            const jsonString = JSON.stringify(decryptedData, null, 2);
+
+            navigator.clipboard.writeText(jsonString).then(() => {
+                copyBtn.classList.add('copied');
+                copyBtn.textContent = '✓ 已复制';
+                setTimeout(() => {
+                    copyBtn.classList.remove('copied');
+                    copyBtn.textContent = '📋 复制';
+                }, 2000);
+            }).catch(err => {
+                // 降级方案
+                const textarea = document.createElement('textarea');
+                textarea.value = jsonString;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+
+                copyBtn.classList.add('copied');
+                copyBtn.textContent = '✓ 已复制';
+                setTimeout(() => {
+                    copyBtn.classList.remove('copied');
+                    copyBtn.textContent = '📋 复制';
+                }, 2000);
+            });
+        }
+
+        function handleSearch(event) {
+            // 如果是回车键，跳转到下一个结果
+            if (event.type === 'keydown' && event.key === 'Enter' && searchResults.length > 0) {
+                event.preventDefault();
+                navigateSearch('next');
+                return;
+            }
+
+            // 如果是上下箭头键，导航搜索结果
+            if (event.type === 'keydown' && searchResults.length > 0) {
+                if (event.key === 'ArrowDown') {
+                    event.preventDefault();
+                    navigateSearch('next');
+                    return;
+                } else if (event.key === 'ArrowUp') {
+                    event.preventDefault();
+                    navigateSearch('prev');
+                    return;
+                }
+            }
+
+            // 如果是其他按键事件但不是输入字符，直接返回
+            if (event.type === 'keydown' && event.key !== 'Enter') {
+                return;
+            }
+
+            const searchTerm = event.target.value;
+            const output = document.getElementById('output');
+            const searchStats = document.getElementById('searchStats');
+            const navButtons = document.getElementById('navButtons');
+
+            if (!decryptedData || !searchTerm) {
+                clearHighlights();
+                searchStats.textContent = '';
+                navButtons.style.display = 'none';
+                return;
+            }
+
+            // 清除之前的高亮
+            clearHighlights();
+
+            // 执行搜索
+            const content = output.innerText;
+            const regex = new RegExp(searchTerm, 'gi');
+            let matches = [];
+            let match;
+
+            while ((match = regex.exec(content)) !== null) {
+                matches.push(match.index);
+            }
+
+            if (matches.length > 0) {
+                // 高亮所有匹配项
+                let html = output.innerHTML;
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = html;
+
+                // 高亮文本
+                highlightText(tempDiv, searchTerm);
+                output.innerHTML = tempDiv.innerHTML;
+
+                // 重新添加复制按钮
+                const copyBtn = document.createElement('button');
+                copyBtn.className = 'copy-btn';
+                copyBtn.textContent = '📋 复制';
+                copyBtn.onclick = copyJSON;
+                output.appendChild(copyBtn);
+
+                // 更新搜索统计
+                searchResults = output.querySelectorAll('.highlight');
+                currentSearchIndex = 0;
+                updateSearchNavigation();
+
+                // 滚动到第一个匹配项
+                if (searchResults.length > 0) {
+                    searchResults[0].classList.add('current-highlight');
+                    searchResults[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+
+                navButtons.style.display = 'flex';
+            } else {
+                searchStats.textContent = '无匹配结果';
+                navButtons.style.display = 'none';
+            }
+        }
+
+        function highlightText(element, searchTerm) {
+            const walker = document.createTreeWalker(
+                element,
+                NodeFilter.SHOW_TEXT,
+                null,
+                false
+            );
+
+            const textNodes = [];
+            let node;
+
+            while (node = walker.nextNode()) {
+                if (node.nodeValue.trim()) {
+                    textNodes.push(node);
+                }
+            }
+
+            textNodes.forEach(node => {
+                const regex = new RegExp(`(${searchTerm})`, 'gi');
+                const matches = node.nodeValue.match(regex);
+
+                if (matches) {
+                    const span = document.createElement('span');
+                    span.innerHTML = node.nodeValue.replace(regex, '<span class="highlight">$1</span>');
+                    node.parentNode.replaceChild(span, node);
+                }
+            });
+        }
+
+        function navigateSearch(direction) {
+            if (searchResults.length === 0) return;
+
+            // 移除当前高亮
+            searchResults[currentSearchIndex].classList.remove('current-highlight');
+
+            // 更新索引
+            if (direction === 'next') {
+                currentSearchIndex = (currentSearchIndex + 1) % searchResults.length;
+            } else {
+                currentSearchIndex = (currentSearchIndex - 1 + searchResults.length) % searchResults.length;
+            }
+
+            // 添加新高亮并滚动
+            searchResults[currentSearchIndex].classList.add('current-highlight');
+            searchResults[currentSearchIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            updateSearchNavigation();
+        }
+
+        function updateSearchNavigation() {
+            const searchStats = document.getElementById('searchStats');
+            if (searchResults.length > 0) {
+                searchStats.textContent = `${currentSearchIndex + 1} / ${searchResults.length}`;
+            }
+        }
+
+        function clearHighlights() {
+            const output = document.getElementById('output');
+            const highlights = output.querySelectorAll('.highlight');
+            highlights.forEach(highlight => {
+                const parent = highlight.parentNode;
+                while (highlight.firstChild) {
+                    parent.insertBefore(highlight.firstChild, highlight);
+                }
+                parent.removeChild(highlight);
+            });
+            searchResults = [];
+            currentSearchIndex = -1;
+        }
+
+        function clearAll() {
+            document.getElementById('key').value = '';
+            document.getElementById('encrypted').value = '';
+            const output = document.getElementById('output');
+            output.innerHTML = '';
+            output.classList.remove('error');
+            document.getElementById('searchInput').value = '';
+            document.getElementById('searchStats').textContent = '';
+            document.getElementById('navButtons').style.display = 'none';
+            decryptedData = null;
+            searchResults = [];
+            currentSearchIndex = -1;
+
+            document.getElementById('statusDot').classList.remove('error');
+            document.getElementById('statusText').textContent = '就绪';
+        }
+
+        function showError(message) {
+            const output = document.getElementById('output');
+            output.classList.add('error');
+            output.innerHTML = `
+                <div style="text-align: center;">
+                    <h3 style="color: #ff6b6b;">❌ ${message}</h3>
+                </div>
+            `;
+
+            document.getElementById('statusDot').classList.add('error');
+            document.getElementById('statusText').textContent = message;
+        }
+
+        // 支持快捷键
+        document.addEventListener('DOMContentLoaded', function() {
+            // 显示当前时间
+            document.getElementById('timestamp').textContent = new Date().toLocaleString();
+
+            // 支持 Ctrl+F 快捷键
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey && e.key === 'f') {
+                    e.preventDefault();
+                    document.getElementById('searchInput').focus();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

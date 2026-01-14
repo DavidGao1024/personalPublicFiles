@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- 渐变定义 -->
+    <linearGradient id="keyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00d4ff;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#7e57c2;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ff79c6;stop-opacity:1" />
+    </linearGradient>
+
+    <!-- 背景渐变 -->
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0e27;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#1a1f3a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0d1117;stop-opacity:1" />
+    </linearGradient>
+
+    <!-- 发光滤镜 -->
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- 内发光 -->
+    <filter id="innerGlow">
+      <feFlood flood-color="#00d4ff" flood-opacity="0.5"/>
+      <feComposite in2="SourceAlpha" operator="out"/>
+      <feGaussianBlur stdDeviation="3"/>
+      <feComposite operator="atop" in2="SourceGraphic"/>
+    </filter>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="512" height="512" rx="100" fill="url(#bgGradient)"/>
+
+  <!-- 背景光晕 -->
+  <circle cx="256" cy="256" r="180" fill="#00d4ff" opacity="0.1" filter="url(#glow)"/>
+  <circle cx="256" cy="256" r="150" fill="#7e57c2" opacity="0.1" filter="url(#glow)"/>
+
+  <!-- 主要钥匙形状 -->
+  <g transform="translate(256, 256)">
+    <!-- 钥匙环 -->
+    <circle cx="-90" cy="0" r="50" fill="none" stroke="url(#keyGradient)" stroke-width="12" filter="url(#glow)"/>
+
+    <!-- 钥匙柄 -->
+    <rect x="-45" y="-8" width="200" height="16" fill="url(#keyGradient)" filter="url(#glow)"/>
+
+    <!-- 钥匙齿 -->
+    <g transform="translate(155, 0)">
+      <rect x="0" y="-8" width="15" height="16" fill="url(#keyGradient)"/>
+      <rect x="20" y="-8" width="15" height="10" fill="url(#keyGradient)"/>
+      <rect x="40" y="-8" width="15" height="14" fill="url(#keyGradient)"/>
+      <rect x="60" y="-8" width="15" height="8" fill="url(#keyGradient)"/>
+    </g>
+
+    <!-- 中心装饰 - 锁孔形状 -->
+    <g transform="translate(-90, 0)">
+      <circle cx="0" cy="-5" r="15" fill="#0a0e27"/>
+      <rect x="-8" y="-5" width="16" height="20" fill="#0a0e27"/>
+      <circle cx="0" cy="-5" r="12" fill="none" stroke="#00d4ff" stroke-width="2" opacity="0.8"/>
+    </g>
+
+    <!-- 数据流装饰 -->
+    <g opacity="0.6">
+      <text x="30" y="-25" font-family="monospace" font-size="14" fill="#00ff88">01101</text>
+      <text x="10" y="35" font-family="monospace" font-size="14" fill="#00ff88">10010</text>
+      <text x="80" y="-30" font-family="monospace" font-size="12" fill="#8be9fd">AES</text>
+      <text x="100" y="30" font-family="monospace" font-size="12" fill="#8be9fd">ECB</text>
+    </g>
+  </g>
+
+  <!-- 角落装饰光点 -->
+  <circle cx="80" cy="80" r="3" fill="#00d4ff" opacity="0.8" filter="url(#glow)"/>
+  <circle cx="432" cy="80" r="3" fill="#ff79c6" opacity="0.8" filter="url(#glow)"/>
+  <circle cx="80" cy="432" r="3" fill="#7e57c2" opacity="0.8" filter="url(#glow)"/>
+  <circle cx="432" cy="432" r="3" fill="#00ff88" opacity="0.8" filter="url(#glow)"/>
+</svg>

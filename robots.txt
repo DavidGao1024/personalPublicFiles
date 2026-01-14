@@ -1,0 +1,8 @@
+# Robots.txt for 大卫的数据解密魔法书
+# Allow all crawlers
+
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://davidgao1024.github.io/personalPublicFiles/sitemap.xml

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>预览图生成器</title>
+</head>
+<body>
+    <h1>社交媒体预览图生成器</h1>
+    <p>生成用于 Open Graph 和 Twitter Card 的预览图片（1200x630）</p>
+    <canvas id="preview" width="1200" height="630"></canvas>
+    <br>
+    <button onclick="downloadImage()">下载预览图 (preview.png)</button>
+
+    <script>
+        const canvas = document.getElementById('preview');
+        const ctx = canvas.getContext('2d');
+
+        // 背景渐变
+        const bgGradient = ctx.createLinearGradient(0, 0, 1200, 630);
+        bgGradient.addColorStop(0, '#0a0e27');
+        bgGradient.addColorStop(0.5, '#1a1f3a');
+        bgGradient.addColorStop(1, '#0d1117');
+        ctx.fillStyle = bgGradient;
+        ctx.fillRect(0, 0, 1200, 630);
+
+        // 添加光晕效果
+        ctx.globalAlpha = 0.3;
+        const radialGradient1 = ctx.createRadialGradient(200, 500, 0, 200, 500, 300);
+        radialGradient1.addColorStop(0, 'rgba(120, 119, 198, 0.8)');
+        radialGradient1.addColorStop(1, 'transparent');
+        ctx.fillStyle = radialGradient1;
+        ctx.fillRect(0, 0, 1200, 630);
+
+        const radialGradient2 = ctx.createRadialGradient(1000, 130, 0, 1000, 130, 300);
+        radialGradient2.addColorStop(0, 'rgba(255, 119, 198, 0.8)');
+        radialGradient2.addColorStop(1, 'transparent');
+        ctx.fillStyle = radialGradient2;
+        ctx.fillRect(0, 0, 1200, 630);
+
+        ctx.globalAlpha = 1;
+
+        // 标题
+        ctx.shadowColor = '#00d4ff';
+        ctx.shadowBlur = 20;
+        ctx.font = 'bold 72px Arial';
+        const titleGradient = ctx.createLinearGradient(0, 100, 0, 200);
+        titleGradient.addColorStop(0, '#00d4ff');
+        titleGradient.addColorStop(0.5, '#7e57c2');
+        titleGradient.addColorStop(1, '#ff79c6');
+        ctx.fillStyle = titleGradient;
+        ctx.textAlign = 'center';
+        ctx.fillText('🔐 大卫的数据解密魔法书', 600, 180);
+
+        // 副标题
+        ctx.shadowBlur = 10;
+        ctx.font = '36px Arial';
+        ctx.fillStyle = '#00ff88';
+        ctx.fillText('安全的 AES 在线解密工具', 600, 250);
+
+        // 特性列表
+        ctx.shadowBlur = 5;
+        ctx.font = '28px Arial';
+        ctx.fillStyle = '#8be9fd';
+        ctx.textAlign = 'left';
+
+        const features = [
+            '✓ 100% 客户端解密，密钥不上传',
+            '✓ 支持 AES ECB 模式',
+            '✓ JSON 格式化与语法高亮',
+            '✓ 实时搜索与高亮显示'
+        ];
+
+        features.forEach((feature, index) => {
+            ctx.fillText(feature, 300, 350 + index * 50);
+        });
+
+        // 装饰性代码元素
+        ctx.globalAlpha = 0.3;
+        ctx.font = '20px monospace';
+        ctx.fillStyle = '#00ff88';
+        ctx.textAlign = 'right';
+        ctx.fillText('AES.decrypt(data, key)', 1100, 550);
+        ctx.fillText('JSON.parse(decrypted)', 1100, 580);
+
+        ctx.textAlign = 'left';
+        ctx.fillText('0110101101100101', 100, 100);
+        ctx.fillText('01111001', 100, 130);
+
+        // 底部网址
+        ctx.globalAlpha = 1;
+        ctx.shadowBlur = 0;
+        ctx.font = '24px Arial';
+        ctx.fillStyle = '#6272a4';
+        ctx.textAlign = 'center';
+        ctx.fillText('davidgao1024.github.io/personalPublicFiles', 600, 580);
+
+        // 钥匙图标（简化版）
+        ctx.save();
+        ctx.translate(600, 400);
+        ctx.scale(0.3, 0.3);
+
+        // 钥匙渐变
+        const keyGradient = ctx.createLinearGradient(-100, -50, 100, 50);
+        keyGradient.addColorStop(0, '#00d4ff');
+        keyGradient.addColorStop(0.5, '#7e57c2');
+        keyGradient.addColorStop(1, '#ff79c6');
+
+        ctx.globalAlpha = 0.2;
+        ctx.shadowColor = '#00d4ff';
+        ctx.shadowBlur = 30;
+
+        // 钥匙环
+        ctx.strokeStyle = keyGradient;
+        ctx.lineWidth = 15;
+        ctx.beginPath();
+        ctx.arc(-90, 0, 60, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // 钥匙柄
+        ctx.fillStyle = keyGradient;
+        ctx.fillRect(-40, -10, 220, 20);
+
+        // 钥匙齿
+        ctx.fillRect(180, -10, 20, 20);
+        ctx.fillRect(210, -10, 20, 15);
+        ctx.fillRect(240, -10, 20, 18);
+
+        ctx.restore();
+
+        function downloadImage() {
+            canvas.toBlob(function(blob) {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'preview.png';
+                a.click();
+                URL.revokeObjectURL(url);
+            });
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        canvas {
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: block;
+            margin: 20px 0;
+        }
+        button {
+            padding: 10px 20px;
+            background: #00d4ff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0099cc;
+        }
+    </style>
+</body>
+</html>

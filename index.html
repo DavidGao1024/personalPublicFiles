@@ -533,11 +533,267 @@
                 border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             }
         }
+
+        /* 主题切换按钮 */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 25px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 14px;
+            color: white;
+            transition: all 0.3s ease;
+            z-index: 10;
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.05);
+        }
+
+        /* 浅色可爱风主题 */
+        body.light-theme {
+            background: linear-gradient(135deg, #ffffff 0%, #fafafa 50%, #f5f5f5 100%);
+        }
+
+        body.light-theme::before {
+            background:
+                radial-gradient(circle at 20% 80%, rgba(200, 200, 200, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(180, 180, 180, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(220, 220, 220, 0.15) 0%, transparent 50%);
+        }
+
+        body.light-theme .container {
+            background: #ffffff;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e5e5e5;
+        }
+
+        body.light-theme .header {
+            background: linear-gradient(135deg, #f8f8f8 0%, #f0f0f0 50%, #e8e8e8 100%);
+        }
+
+        body.light-theme .header h1 {
+            color: #333333;
+            text-shadow: none;
+        }
+
+        body.light-theme .header p {
+            color: #666666;
+        }
+
+        body.light-theme .theme-toggle {
+            background: rgba(255, 255, 255, 0.6);
+            border-color: #d0d0d0;
+            color: #333333;
+        }
+
+        body.light-theme .left-panel,
+        body.light-theme .right-panel {
+            background: #ffffff;
+        }
+
+        body.light-theme .left-panel {
+            border-right: 1px solid #e5e5e5;
+        }
+
+        body.light-theme label {
+            color: #333333;
+        }
+
+        body.light-theme input[type="password"],
+        body.light-theme input[type="text"],
+        body.light-theme textarea {
+            background: #ffffff;
+            border: 1px solid #d0d0d0;
+            color: #333333;
+            box-shadow: none;
+        }
+
+        body.light-theme input[type="password"]:focus,
+        body.light-theme input[type="text"]:focus,
+        body.light-theme textarea:focus {
+            border-color: #999999;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+            background: #ffffff;
+        }
+
+        body.light-theme input::placeholder,
+        body.light-theme textarea::placeholder {
+            color: #999999;
+        }
+
+        body.light-theme .toggle-visibility {
+            background: #f5f5f5;
+            border-color: #d0d0d0;
+            color: #333333;
+        }
+
+        body.light-theme .toggle-visibility:hover {
+            background: #eeeeee;
+            box-shadow: none;
+        }
+
+        body.light-theme button {
+            background: linear-gradient(135deg, #555555 0%, #333333 100%);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            color: #ffffff;
+        }
+
+        body.light-theme button:hover {
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        body.light-theme button.secondary {
+            background: #f5f5f5;
+            color: #333333;
+            border: 1px solid #d0d0d0;
+        }
+
+        body.light-theme button.secondary:hover {
+            background: #eeeeee;
+            box-shadow: none;
+        }
+
+        body.light-theme .search-input {
+            background: #ffffff;
+            border-color: #d0d0d0;
+            color: #333333;
+        }
+
+        body.light-theme .search-input:focus {
+            border-color: #999999;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-theme .search-stats {
+            color: #333333;
+        }
+
+        body.light-theme .nav-btn {
+            background: #f5f5f5;
+            border-color: #d0d0d0;
+            color: #333333;
+        }
+
+        body.light-theme .nav-btn:hover {
+            background: #eeeeee;
+            box-shadow: none;
+        }
+
+        body.light-theme .json-output {
+            background: #ffffff;
+            border-color: #d0d0d0;
+            color: #333333;
+            box-shadow: none;
+        }
+
+        body.light-theme .json-output.error {
+            border-color: #cc6666;
+            background: #fff8f8;
+            color: #993333;
+        }
+
+        body.light-theme .json-key {
+            color: #0066cc;
+        }
+
+        body.light-theme .json-string {
+            color: #008800;
+        }
+
+        body.light-theme .json-number {
+            color: #cc6600;
+        }
+
+        body.light-theme .json-boolean {
+            color: #990099;
+        }
+
+        body.light-theme .json-null {
+            color: #999999;
+        }
+
+        body.light-theme .highlight {
+            background-color: rgba(255, 230, 0, 0.4);
+            box-shadow: none;
+        }
+
+        body.light-theme .current-highlight {
+            background-color: rgba(255, 180, 0, 0.5);
+            box-shadow: none;
+        }
+
+        body.light-theme .copy-btn {
+            background: #f5f5f5;
+            border-color: #d0d0d0;
+            color: #333333;
+        }
+
+        body.light-theme .copy-btn:hover {
+            background: #eeeeee;
+            box-shadow: none;
+        }
+
+        body.light-theme .copy-btn.copied {
+            background: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
+        }
+
+        body.light-theme .status-bar {
+            background: #f8f8f8;
+            border-top: 1px solid #e5e5e5;
+            color: #333333;
+        }
+
+        body.light-theme .status-dot {
+            background: #66cc66;
+            box-shadow: none;
+        }
+
+        body.light-theme .status-dot.error {
+            background: #cc6666;
+            box-shadow: none;
+        }
+
+        body.light-theme .spinner {
+            border-color: #e0e0e0;
+            border-top-color: #666666;
+            box-shadow: none;
+        }
+
+        body.light-theme .loading p {
+            color: #333333 !important;
+        }
+
+        /* 使用说明区域 */
+        body.light-theme .form-group div[style*="background: rgba(0, 212, 255"] {
+            background: #f8f8f8 !important;
+            border-color: #e0e0e0 !important;
+            color: #555555 !important;
+        }
+
+        body.light-theme .form-group div[style*="background: rgba(0, 212, 255"] p[style*="color: #ffb86c"] {
+            color: #996600 !important;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
+            <button class="theme-toggle" onclick="toggleTheme()">
+                <span id="themeIcon">🌸</span>
+                <span id="themeText">明亮</span>
+            </button>
             <h1>🔐 大卫的数据解密魔法书</h1>
             <p>安全的客户端解密工具 - 密钥不会被存储或传输</p>
         </div>
@@ -611,6 +867,35 @@
         let decryptedData = null;
         let searchResults = [];
         let currentSearchIndex = -1;
+
+        // 主题切换功能
+        function toggleTheme() {
+            const body = document.body;
+            const themeIcon = document.getElementById('themeIcon');
+            const themeText = document.getElementById('themeText');
+
+            if (body.classList.contains('light-theme')) {
+                body.classList.remove('light-theme');
+                themeIcon.textContent = '🌸';
+                themeText.textContent = '明亮';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                body.classList.add('light-theme');
+                themeIcon.textContent = '🌙';
+                themeText.textContent = '暗夜';
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        // 页面加载时恢复主题设置
+        (function initTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-theme');
+                document.getElementById('themeIcon').textContent = '🌙';
+                document.getElementById('themeText').textContent = '暗夜';
+            }
+        })();
 
         function toggleKeyVisibility() {
             const keyInput = document.getElementById('key');

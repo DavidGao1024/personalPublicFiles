@@ -1252,8 +1252,12 @@
 
         // 支持快捷键
         document.addEventListener('DOMContentLoaded', function() {
-            // 显示当前时间
-            document.getElementById('timestamp').textContent = new Date().toLocaleString();
+            // 显示当前时间并每秒更新
+            function updateTime() {
+                document.getElementById('timestamp').textContent = new Date().toLocaleString();
+            }
+            updateTime();
+            setInterval(updateTime, 1000);
 
             // 支持 Ctrl+F 快捷键
             document.addEventListener('keydown', function(e) {

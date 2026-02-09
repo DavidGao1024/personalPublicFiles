@@ -1101,26 +1101,23 @@
             const rawLines = formatted.split('\n');
             const htmlLines = highlighted.split('\n');
             const foldRanges = findFoldRanges(rawLines);
+            const len = htmlLines.length;
+            var parts = new Array(len * 2 + 2);
+            var idx = 0;
 
-            var html = '<div class="json-lines">';
-            for (var i = 0; i < htmlLines.length; i++) {
-                var lineNum = i + 1;
+            parts[idx++] = '<div class="json-lines">';
+            for (var i = 0; i < len; i++) {
                 var hasFold = foldRanges.hasOwnProperty(i);
-                html += '<div class="json-line" data-line="' + i + '"';
-                if (hasFold) html += ' data-fold-end="' + foldRanges[i] + '"';
-                html += '>';
-                html += '<span class="line-gutter">';
-                if (hasFold) {
-                    html += '<span class="json-toggle" onclick="toggleFold(this)">&#9660;</span>';
-                }
-                html += '<span class="line-number">' + lineNum + '</span>';
-                html += '</span>';
-                html += '<span class="line-content">' + htmlLines[i] + '</span>';
-                html += '</div>';
+                parts[idx++] = '<div class="json-line" data-line="' + i + '"'
+                    + (hasFold ? ' data-fold-end="' + foldRanges[i] + '">' : '>')
+                    + '<span class="line-gutter">'
+                    + (hasFold ? '<span class="json-toggle" onclick="toggleFold(this)">&#9660;</span>' : '')
+                    + '<span class="line-number">' + (i + 1) + '</span></span>'
+                    + '<span class="line-content">' + htmlLines[i] + '</span></div>';
             }
-            html += '</div>';
+            parts[idx++] = '</div>';
 
-            output.innerHTML = html;
+            output.innerHTML = parts.join('');
 
             var copyBtn = document.createElement('button');
             copyBtn.className = 'copy-btn';
@@ -1131,8 +1128,7 @@
 
         function syntaxHighlight(json) {
             json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-            return json.replace(/("(\u[a-zA-Z0-9]{4}|\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
-                var cls = 'json-number';
+            return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
                 if (/^"/.test(match)) {
                     if (/:$/.test(match)) {
                         cls = 'json-key';
@@ -1309,6 +1305,8 @@
         }
 
         function highlightText(element, searchTerm) {
+            var escaped = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            var regex = new RegExp('(' + escaped + ')', 'gi');
             var contentSpans = element.querySelectorAll('.line-content');
             contentSpans.forEach(function(contentSpan) {
                 var walker = document.createTreeWalker(
@@ -1327,13 +1325,16 @@
                 }
 
                 textNodes.forEach(function(node) {
-                    var regex = new RegExp('(' + searchTerm + ')', 'gi');
-                    var matches = node.nodeValue.match(regex);
-                    if (matches) {
-                        var span = document.createElement('span');
-                        span.innerHTML = node.nodeValue.replace(regex, '<span class="highlight">$1</span>');
-                        node.parentNode.replaceChild(span, node);
+                    if (!regex.test(node.nodeValue)) {
+                        regex.lastIndex = 0;
+                        return;
                     }
+                    regex.lastIndex = 0;
+                    var safeText = node.nodeValue.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                    var span = document.createElement('span');
+                    span.className = 'search-wrapper';
+                    span.innerHTML = safeText.replace(regex, '<span class="highlight">$1</span>');
+                    node.parentNode.replaceChild(span, node);
                 });
             });
         }
@@ -1375,6 +1376,15 @@
                 }
                 parent.removeChild(highlight);
             });
+            const wrappers = output.querySelectorAll('.search-wrapper');
+            wrappers.forEach(wrapper => {
+                const parent = wrapper.parentNode;
+                while (wrapper.firstChild) {
+                    parent.insertBefore(wrapper.firstChild, wrapper);
+                }
+                parent.removeChild(wrapper);
+            });
+            output.normalize();
             searchResults = [];
             currentSearchIndex = -1;
         }

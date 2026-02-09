@@ -130,7 +130,8 @@
 
         .main {
             display: flex;
-            min-height: 600px;
+            height: calc(100vh - 160px);
+            min-height: 500px;
         }
 
         .left-panel {
@@ -138,6 +139,7 @@
             padding: 30px;
             border-right: 1px solid rgba(255, 255, 255, 0.1);
             background: rgba(255, 255, 255, 0.02);
+            overflow-y: auto;
         }
 
         .right-panel {
@@ -146,6 +148,8 @@
             display: flex;
             flex-direction: column;
             background: rgba(255, 255, 255, 0.02);
+            min-height: 0;
+            overflow: hidden;
         }
 
         .form-group {
@@ -354,21 +358,11 @@
             font-size: 14px;
             line-height: 1.6;
             position: relative;
-            max-height: calc(100vh - 350px);
-            word-wrap: break-word;
-            word-break: break-all;
-            white-space: pre-wrap;
+            min-height: 0;
             color: #00ff88;
             box-shadow:
                 inset 0 2px 8px rgba(0, 0, 0, 0.5),
                 0 0 20px rgba(0, 212, 255, 0.1);
-        }
-
-        .json-output pre {
-            white-space: pre-wrap !important;
-            word-wrap: break-word !important;
-            word-break: break-all !important;
-            width: 100%;
         }
 
         .json-output.error {
@@ -426,6 +420,102 @@
 
         .json-null {
             color: #6272a4;
+        }
+
+        /* JSON 行号与折叠样式 */
+        .json-lines {
+            display: block;
+            margin: 0;
+            padding: 0;
+        }
+
+        .json-line {
+            display: flex;
+            line-height: 1.6;
+            min-height: 1.6em;
+        }
+
+        .json-line.hidden {
+            display: none;
+        }
+
+        .line-gutter {
+            display: flex;
+            align-items: flex-start;
+            min-width: 68px;
+            width: 68px;
+            padding-right: 6px;
+            user-select: none;
+            flex-shrink: 0;
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+            margin-right: 12px;
+        }
+
+        .line-number {
+            flex: 1;
+            text-align: right;
+            color: #6272a4;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .json-toggle {
+            cursor: pointer;
+            width: 16px;
+            text-align: center;
+            color: #6272a4;
+            font-size: 16px;
+            line-height: 1.6;
+            transition: transform 0.15s ease;
+            flex-shrink: 0;
+            margin-right: -4px;
+        }
+
+        .json-toggle:hover {
+            color: #00d4ff;
+        }
+
+        .json-toggle.collapsed {
+            transform: rotate(-90deg);
+        }
+
+        .json-ellipsis {
+            color: #6272a4;
+            cursor: pointer;
+            margin-left: 4px;
+        }
+
+        .json-ellipsis:hover {
+            color: #00d4ff;
+        }
+
+        .line-content {
+            flex: 1;
+            white-space: pre;
+        }
+
+        body.light-theme .line-gutter {
+            border-right-color: rgba(0, 0, 0, 0.08);
+        }
+
+        body.light-theme .line-number {
+            color: #999999;
+        }
+
+        body.light-theme .json-toggle {
+            color: #999999;
+        }
+
+        body.light-theme .json-toggle:hover {
+            color: #333333;
+        }
+
+        body.light-theme .json-ellipsis {
+            color: #999999;
+        }
+
+        body.light-theme .json-ellipsis:hover {
+            color: #333333;
         }
 
         .highlight {
@@ -526,11 +616,18 @@
         @media (max-width: 768px) {
             .main {
                 flex-direction: column;
+                height: auto;
+                min-height: 600px;
             }
 
             .left-panel {
                 border-right: none;
                 border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                overflow-y: visible;
+            }
+
+            .right-panel {
+                min-height: 400px;
             }
         }
 
@@ -999,25 +1096,43 @@
             const output = document.getElementById('output');
             output.classList.remove('error');
 
-            // 创建复制按钮
-            const copyBtn = document.createElement('button');
+            const formatted = JSON.stringify(data, null, 2);
+            const highlighted = syntaxHighlight(formatted);
+            const rawLines = formatted.split('\n');
+            const htmlLines = highlighted.split('\n');
+            const foldRanges = findFoldRanges(rawLines);
+
+            var html = '<div class="json-lines">';
+            for (var i = 0; i < htmlLines.length; i++) {
+                var lineNum = i + 1;
+                var hasFold = foldRanges.hasOwnProperty(i);
+                html += '<div class="json-line" data-line="' + i + '"';
+                if (hasFold) html += ' data-fold-end="' + foldRanges[i] + '"';
+                html += '>';
+                html += '<span class="line-gutter">';
+                if (hasFold) {
+                    html += '<span class="json-toggle" onclick="toggleFold(this)">&#9660;</span>';
+                }
+                html += '<span class="line-number">' + lineNum + '</span>';
+                html += '</span>';
+                html += '<span class="line-content">' + htmlLines[i] + '</span>';
+                html += '</div>';
+            }
+            html += '</div>';
+
+            output.innerHTML = html;
+
+            var copyBtn = document.createElement('button');
             copyBtn.className = 'copy-btn';
             copyBtn.textContent = '📋 复制';
             copyBtn.onclick = copyJSON;
-
-            // 格式化JSON并保留缩进
-            const formattedJSON = JSON.stringify(data, null, 2);
-            const formattedHTML = syntaxHighlight(formattedJSON);
-
-            // 使用 pre 标签保留格式
-            output.innerHTML = '<pre style="margin: 0; background: transparent; border: none; padding: 0;">' + formattedHTML + '</pre>';
             output.appendChild(copyBtn);
         }
 
         function syntaxHighlight(json) {
             json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-            return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
-                let cls = 'json-number';
+            return json.replace(/("(\u[a-zA-Z0-9]{4}|\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+                var cls = 'json-number';
                 if (/^"/.test(match)) {
                     if (/:$/.test(match)) {
                         cls = 'json-key';
@@ -1031,6 +1146,68 @@
                 }
                 return '<span class="' + cls + '">' + match + '</span>';
             });
+        }
+
+        function findFoldRanges(rawLines) {
+            var ranges = {};
+            var stack = [];
+            for (var i = 0; i < rawLines.length; i++) {
+                var trimmed = rawLines[i].trim();
+                var lastChar = trimmed.charAt(trimmed.length - 1);
+                if (lastChar === '{' || lastChar === '[') {
+                    stack.push(i);
+                }
+                var firstChar = trimmed.charAt(0);
+                if (firstChar === '}' || firstChar === ']') {
+                    if (stack.length > 0) {
+                        var start = stack.pop();
+                        ranges[start] = i;
+                    }
+                }
+            }
+            return ranges;
+        }
+
+        function toggleFold(el) {
+            var lineDiv = el.closest('.json-line');
+            var startIdx = parseInt(lineDiv.dataset.line);
+            var endIdx = parseInt(lineDiv.dataset.foldEnd);
+            var isCollapsed = el.classList.toggle('collapsed');
+            var container = lineDiv.parentNode;
+            var allLines = container.querySelectorAll('.json-line');
+
+            if (isCollapsed) {
+                for (var i = startIdx + 1; i < endIdx; i++) {
+                    allLines[i].classList.add('hidden');
+                }
+                var ellipsis = lineDiv.querySelector('.json-ellipsis');
+                if (!ellipsis) {
+                    ellipsis = document.createElement('span');
+                    ellipsis.className = 'json-ellipsis';
+                    ellipsis.onclick = function() { toggleFold(el); };
+                    var content = lineDiv.querySelector('.line-content');
+                    var text = content.textContent.trim();
+                    var bracket = text.charAt(text.length - 1);
+                    var closeBracket = bracket === '{' ? '}' : ']';
+                    ellipsis.textContent = ' ...' + closeBracket;
+                    content.appendChild(ellipsis);
+                }
+                ellipsis.style.display = 'inline';
+                allLines[endIdx].classList.add('hidden');
+            } else {
+                for (var i = startIdx + 1; i <= endIdx; i++) {
+                    allLines[i].classList.remove('hidden');
+                    var nestedToggle = allLines[i].querySelector('.json-toggle.collapsed');
+                    if (nestedToggle) {
+                        var nestedEnd = parseInt(allLines[i].dataset.foldEnd);
+                        for (var j = parseInt(allLines[i].dataset.line) + 1; j <= nestedEnd; j++) {
+                            allLines[j].classList.add('hidden');
+                        }
+                    }
+                }
+                var ellipsis = lineDiv.querySelector('.json-ellipsis');
+                if (ellipsis) ellipsis.style.display = 'none';
+            }
         }
 
         function copyJSON() {
@@ -1105,35 +1282,16 @@
             // 清除之前的高亮
             clearHighlights();
 
-            // 执行搜索
-            const content = output.innerText;
-            const regex = new RegExp(searchTerm, 'gi');
-            let matches = [];
-            let match;
+            // 搜索前展开所有折叠，确保能搜到全部内容
+            expandAllFolds(output);
 
-            while ((match = regex.exec(content)) !== null) {
-                matches.push(match.index);
-            }
+            // 在 line-content 中执行搜索
+            highlightText(output, searchTerm);
 
-            if (matches.length > 0) {
-                // 高亮所有匹配项
-                let html = output.innerHTML;
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = html;
+            // 更新搜索统计
+            searchResults = output.querySelectorAll('.highlight');
 
-                // 高亮文本
-                highlightText(tempDiv, searchTerm);
-                output.innerHTML = tempDiv.innerHTML;
-
-                // 重新添加复制按钮
-                const copyBtn = document.createElement('button');
-                copyBtn.className = 'copy-btn';
-                copyBtn.textContent = '📋 复制';
-                copyBtn.onclick = copyJSON;
-                output.appendChild(copyBtn);
-
-                // 更新搜索统计
-                searchResults = output.querySelectorAll('.highlight');
+            if (searchResults.length > 0) {
                 currentSearchIndex = 0;
                 updateSearchNavigation();
 
@@ -1151,31 +1309,32 @@
         }
 
         function highlightText(element, searchTerm) {
-            const walker = document.createTreeWalker(
-                element,
-                NodeFilter.SHOW_TEXT,
-                null,
-                false
-            );
+            var contentSpans = element.querySelectorAll('.line-content');
+            contentSpans.forEach(function(contentSpan) {
+                var walker = document.createTreeWalker(
+                    contentSpan,
+                    NodeFilter.SHOW_TEXT,
+                    null,
+                    false
+                );
 
-            const textNodes = [];
-            let node;
-
-            while (node = walker.nextNode()) {
-                if (node.nodeValue.trim()) {
-                    textNodes.push(node);
+                var textNodes = [];
+                var node;
+                while (node = walker.nextNode()) {
+                    if (node.nodeValue.trim()) {
+                        textNodes.push(node);
+                    }
                 }
-            }
 
-            textNodes.forEach(node => {
-                const regex = new RegExp(`(${searchTerm})`, 'gi');
-                const matches = node.nodeValue.match(regex);
-
-                if (matches) {
-                    const span = document.createElement('span');
-                    span.innerHTML = node.nodeValue.replace(regex, '<span class="highlight">$1</span>');
-                    node.parentNode.replaceChild(span, node);
-                }
+                textNodes.forEach(function(node) {
+                    var regex = new RegExp('(' + searchTerm + ')', 'gi');
+                    var matches = node.nodeValue.match(regex);
+                    if (matches) {
+                        var span = document.createElement('span');
+                        span.innerHTML = node.nodeValue.replace(regex, '<span class="highlight">$1</span>');
+                        node.parentNode.replaceChild(span, node);
+                    }
+                });
             });
         }
 
@@ -1218,6 +1377,13 @@
             });
             searchResults = [];
             currentSearchIndex = -1;
+        }
+
+        function expandAllFolds(container) {
+            var toggles = container.querySelectorAll('.json-toggle.collapsed');
+            toggles.forEach(function(toggle) {
+                toggleFold(toggle);
+            });
         }
 
         function clearAll() {
